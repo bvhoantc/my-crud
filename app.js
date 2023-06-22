@@ -4,12 +4,14 @@ const { initDBCallBack } = require('./db/connection')
 var fs = require('fs')
 const mongoose = require("mongoose");
 const cors = require("cors");
-global.fsx = require('fs.extra')
 global.path = require('path')
+global.fsx = require('fs.extra')
 global._ = require('underscore')
 global.__basedir = __dirname
+global._request = require('request')
 global._rootPath = path.dirname(require.main.filename)
 global._libsPath = path.normalize(path.join(__dirname, 'libs'))
+global.mongodb = require('mongodb')
 const dotenv = require('dotenv')
 dotenv.config()
 const PORT = 8000;
@@ -33,8 +35,8 @@ global.moment = global._moment
 global._async = require('async')
 global.mongoose = require('mongoose')
 global._dbName = _config.database.name
-global._initDBCallBack = initDBCallBack 
-global.mongodb = require('mongodb')
+global._initDBCallBack = initDBCallBack
+
 global.pagination = require('pagination')
 
 require(path.join(__dirname, 'libs', 'resource'))
@@ -54,19 +56,7 @@ _initDBCallBack(_dbPath, _dbName, function (err, db, client) {
   const redisClient = require("./caches/redis")
   redisClient.init(_config.redis)
 })
-switch (process.env.NODE_ENV) {
-  case 'development':
-      require(path.join(__dirname, 'libs', 'router.js'))(app)
-      break
-  case 'production':
-      require(path.join(__dirname, 'libs', 'router.js'))(app)
-      break
-  default:
-      require(path.join(__dirname, 'libs', 'router.js'))(app)
-      break
-}
-
-
+app.use('/assets', express.static(path.join(__dirname, 'assets')))
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
 app.set('view cache', false)
@@ -79,10 +69,23 @@ app.use(require('express-session')({ secret: 'dft.vn', resave: false, saveUninit
 app.use(require('multer')({ dest: path.join(__dirname, 'temp') }).any())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.resource = require(path.join(__dirname, 'libs', 'resource'))
+console.log("app",app);
+switch (process.env.NODE_ENV) {
+  case 'development':
+      require(path.join(_rootPath, 'libs', 'router.js'))(app)
+      break
+  case 'production':
+      require(path.join(_rootPath, 'libs', 'router.js'))(app)
+      break
+  default:
+      require(path.join(_rootPath, 'libs', 'router.js'))(app)
+      break
+}
 app.use(function (req, res, next) {
   res.render('404', { title: '404 | Page not found' })
 })
-app.use('/assets', express.static(path.join(__dirname, 'assets')))
+
 app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.render('500', { message: err.message })
