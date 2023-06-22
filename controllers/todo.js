@@ -1,60 +1,49 @@
-const Todo = require("../modals/todo");
+exports.index = {
+  json: async function (req, res) {
+      try {
+          var page = _.has(req.query, 'page') ? parseInt(req.query.page) : 1;
+          var rows = _.has(req.query, 'rows') ? parseInt(req.query.rows) : 10;
+          var query = {};
+          let agg = [];
+          agg.push({ $match: query });
+          const data = await _Todo.aggregatePaginate(_Todo.aggregate(agg), { page: page, limit: rows });
+          
+          var paginator = new pagination.SearchPaginator({
+              prelink: '/todo',
+              current: page,
+              rowsPerPage: rows,
+              totalResult: data.total
+          });
 
-
-const getTodos = async (req, res) => {
-  try {
-    const todos = await Todo.find({});
-    res.json(todos);
-  } catch (error) {
-    res.send(error);
+          const newData = data.docs;
+          return res.json({
+              code: 200,
+              currentPage: page,
+              currentRows: rows,
+              data: newData,
+              totalResult: data.total,
+              paging: paginator.getPaginationData()
+          });
+      } catch (error) {
+          return res.json({
+              code: 500,
+              message: error.message? error.message : error
+          })
+      }
+  },
+  html: async function (req, res) {
+      try {
+          let campains = await _Todo.find()
+          _.render(req, res, 'todo', {
+              title: 'To do',
+              campains: campains || [],
+              plugins: [['bootstrap-select']],
+          }, true);
+      } catch (error) {
+          return res.json({
+              code: 500,
+              message: error.message? error.message : error
+          })
+      }
   }
-};
-const createTodo = async (req, res) => {
-  try {
-    const todo = new Todo({
-      title: req.body.title,
-      description: req.body.description,
-      completed: req.body.completed,
-    });
-    const savedTodo = await todo.save();
-    res.json(savedTodo);
-  } catch (error) {
-    res.send(error);
-  }
-};
-const updateTodo = async (req, res) => {
-  try {
-    const updatedTodo = await Todo.findOneAndUpdate(
-      { _id: req.params.todoID },
-      {
-        $set: {
-          title: req.body.title,
-          description: req.body.description,
-          completed: req.body.completed,
-        },
-      },
-      { new: true }
-    );
-    res.json(updatedTodo);
-  } catch (error) {
-    res.send(error);
-  }
-};
-
-const deleteTodo = async (req, res) => {
-  try {
-    const deleteTodos = await Todo.findOneAndDelete(
-      { _id: req.params.todoID }
-    );
-    res.json(deleteTodos);
-  } catch (error) {
-    res.send(error);
-  }
-};
-
-module.exports = {
-  getTodos,
-  createTodo,
-  updateTodo,
-  deleteTodo
-};
+}
