@@ -30,11 +30,13 @@ switch (process.env.NODE_ENV) {
         global._config = require(path.normalize(path.join(__dirname, 'config', 'conf.json')));
         break;
 }
-global._dbPath = 'mongodb+srv://' + _config.database.user + ':' + _config.database.pwd + '@' + _config.database.ip + '/' + _config.database.name
+global._dbPath = 'mongodb://' + _config.database.ip + ':' + _config.database.port ;
+// global._dbPath = 'mongodb+srv://' + _config.database.user + ':' + _config.database.pwd + '@' + _config.database.ip
 global._moment = require('moment');
 global.moment = global._moment;
 global._async = require('async');
 global.mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 global._dbName = _config.database.name;
 global._initDBCallBack = initDBCallBack;
 
@@ -48,6 +50,7 @@ var cron = require('node-cron');
 _initDBCallBack(_dbPath, _dbName, function (err, db, client) {
     if (err) return process.exit(1);
     global['mongoClient'] = db;
+    // console.log("global['mongoClient']",global['mongoClient']);
 });
 var app = express();
 
@@ -76,7 +79,6 @@ switch (process.env.NODE_ENV) {
         require(path.join(_rootPath, 'libs', 'router.js'))(app);
         break;
 }
-console.log("db", _dbPath);
 
 app.use(function (req, res, next) {
     res.render('404', { title: '404 | Page not found' });

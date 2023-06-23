@@ -10,9 +10,9 @@
       },
     "database": {
         "name": "test",
-        "ip": "cluster0.y7egyid.mongodb.net",
+        "ip": "127.0.0.1",
         "port": 27017,
-        "user": "bvhoantc1520", 
-        "pwd": "KL3Hr6HJtKNeftDx"
+        "user": "", 
+        "pwd": ""
     }
 }

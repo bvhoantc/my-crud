@@ -11,7 +11,7 @@ const initDB = async (dbPath, dbName) => {
 
 const initDBCallBack = (dbPath, dbName, callback) => {
   let opts = { useNewUrlParser: true, useUnifiedTopology: true };
-  MongoClient.connect(dbPath, opts, (err, client) => {
+  MongoClient.connect(dbPath, opts, async (err, client) => {
     if (err) callback(err);
     else {
       let db = client.db(dbName);
