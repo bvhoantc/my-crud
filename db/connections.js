@@ -15,6 +15,7 @@ const initDBCallBack = (dbPath, dbName, callback) => {
     if (err) callback(err);
     else {
       let db = client.db(dbName);
+      console.log("Connected");
       callback(null, db, client);
     }
   });
