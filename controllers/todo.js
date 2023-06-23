@@ -1,29 +1,37 @@
 exports.index = {
   json: async function (req, res) {
       try {
-        console.log("req");
-          var page = _.has(req.query, 'page') ? parseInt(req.query.page) : 1;
-          var rows = _.has(req.query, 'rows') ? parseInt(req.query.rows) : 10;
-          let query = {}
-          let agg = [];
-          const data = await _Todo.aggregatePaginate(_Todo.aggregate(agg), { page: page, limit: rows });
-          console.log("data",data);
-          var paginator = new pagination.SearchPaginator({
-              prelink: '/todo',
-              current: page,
-              rowsPerPage: rows,
-              totalResult: data.total
-          });
-
-          const newData = data.docs;
-          return res.json({
-              code: 200,
-              currentPage: page,
-              currentRows: rows,
-              data: newData,
-              totalResult: data.total,
-              paging: paginator.getPaginationData()
-          });
+        let query = {};
+        var page = _.has(req.query, 'page') ? parseInt(req.query.page) : 1;
+        var limit = _.has(req.query, 'limit') ? parseInt(req.query.limit) : 10;
+        if (req.query.title) query.title = req.query.title;
+        if (req.query.complete) query.complete = Number(req.query.complete)
+        
+        // lấy dữ liệu
+        let dataQuery = mongoClient.collection('todos').aggregate([
+          { $match: query },
+          { $skip: ( page - 1 ) * limit},
+          { $limit: limit },
+        ]);
+        
+        // lấy tổng số
+        let countQuery = mongoClient.collection('todos').aggregate([
+          { $match: query },
+          { $count: 'total' },
+        ]);
+        
+        let [dataResult, countResult] = await Promise.all([dataQuery.toArray(), countQuery.toArray()]);
+        
+        let data = dataResult || [];
+        let totalResult = countResult[0]?.total || 0;
+        
+        return res.json({
+          code: 200,
+          currentPage: page,
+          currentRows: limit,
+          data: data,
+          totalResult: totalResult,
+        });
       } catch (error) {
           return res.json({
               code: 500,
