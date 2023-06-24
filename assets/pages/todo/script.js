@@ -12,12 +12,14 @@ var DFT = function ($) {
 
         // Click nút Lọc/Search
         $(document).on('click', '#btn-search', function () {
+            console.log("aloo");
             requestManagement();
         });
 
         // Nhấn enter khi search
-        $(document).on('keyup', '#searchForm', function (e) {
-            if (e.keyCode == 13) requestManagement();
+        $(document).on('keyup', '#title', function (e) {
+            console.log("ahih");
+            // if (e.keyCode == 13) requestManagement();
         });
     };
 
@@ -29,26 +31,27 @@ var DFT = function ($) {
         if (page) {
             filter.page = page;
         }
-        _AjaxData('manage-customer-import?' + $.param(filter), 'GET', {}, function (resp) {
+        _AjaxData('todo?' + $.param(filter), 'GET', {}, function (resp) {
+            console.log("resp",resp);
             if (resp.code == 200 && resp.data && resp.data.length > 0) {
                 let html = '';
-                resp.data.forEach((item, i) => {
-                    html += `<tr>
-                                <td class="text-center">${item.field_so_dien_thoai || ''}</td>
-                                <td class="text-center">${item.field_ho_ten || ''}</td>
-                                <td class="text-center">${item.sources || ''}</td>
-                                <td class="text-center">${item.telco || ''}</td>
-                                <td class="text-center">${item.checked == 0 ? 'Checking' : 'Checked'}</td>
-                                <td class="text-center">
-                                </td>
-                            </tr>`
-                });
-                $('#manage-customer-import').html(html);
-                $('#count-total').html('<b>' +
-                        '<span class="">Tổng</span>: ' +
-                        '<span class="bold c-red" id="count-total">' + resp.totalResult + '</span>' +
-                        '</b>');
-                return $('#paging').html(createPaging(resp.paging));
+                // resp.data.forEach((item, i) => {
+                //     html += `<tr>
+                //                 <td class="text-center">${item.field_so_dien_thoai || ''}</td>
+                //                 <td class="text-center">${item.field_ho_ten || ''}</td>
+                //                 <td class="text-center">${item.sources || ''}</td>
+                //                 <td class="text-center">${item.telco || ''}</td>
+                //                 <td class="text-center">${item.checked == 0 ? 'Checking' : 'Checked'}</td>
+                //                 <td class="text-center">
+                //                 </td>
+                //             </tr>`
+                // });
+                // $('#todo').html(html);
+                // $('#count-total').html('<b>' +
+                //         '<span class="">Tổng</span>: ' +
+                //         '<span class="bold c-red" id="count-total">' + resp.totalResult + '</span>' +
+                //         '</b>');
+                // return $('#paging').html(createPaging(resp.paging));
             }
             else {
                 swal({
@@ -56,7 +59,7 @@ var DFT = function ($) {
                     text: "Không tìm thấy dữ liệu phù hợp",
                     type: "warning", showCancelButton: false, confirmButtonColor: "#DD6B55", confirmButtonText: "Quay lại!"
                 });
-                $('#manage-customer-import').html('');
+                $('#todo').html('');
                 $('#count-total').html('');
                 return $('#paging').html(createPaging(resp.paging));
             }

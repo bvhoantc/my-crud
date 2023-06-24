@@ -7,6 +7,7 @@ fsx.readdirSync(path.join(_rootPath, 'modals')).forEach(function (file) {
     console.info('Modal : '.yellow + '_' + _.classify(_.replaceAll(file.toLowerCase(), '.js', '')))
 })
 module.exports = function routers(app) {
+    app.locals._breadCrumbs = _.breadCrumbs;
     fsx.readdirSync(path.join(_rootPath, 'controllers')).forEach(function (file) {
         if (path.extname(file) !== '.js') return
         app.resource(_.trim(_.dasherize(_.replaceAll(file.toLowerCase(), '.js', ''))).toString(), require(path.join(_rootPath, 'controllers', file.toString())))

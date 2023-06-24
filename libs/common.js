@@ -548,6 +548,7 @@ module.exports = {
         return _.clean(output)
     },
     breadCrumbs: function (menus, url) {
+        console.log("vao day",menus, url);
         var module = url.split('?')[0].split('/')
         var temp = []
         _.each(menus, function (menu) {

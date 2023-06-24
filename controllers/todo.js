@@ -1,6 +1,7 @@
 exports.index = {
   json: async function (req, res) {
       try {
+        console.log("req",req.query);
         let query = {};
         var page = _.has(req.query, 'page') ? parseInt(req.query.page) : 1;
         var limit = _.has(req.query, 'limit') ? parseInt(req.query.limit) : 10;
