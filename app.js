@@ -15,7 +15,6 @@ global.__basedir = __dirname;
 global._request = require('request');
 global._rootPath = path.dirname(require.main.filename);
 global._libsPath = path.normalize(path.join(__dirname, 'libs'));
-
 const dotenv = require('dotenv')
 dotenv.config()
 
@@ -66,8 +65,8 @@ app.use(require('express-session')({ secret: 'dft.vn', resave: false, saveUninit
 app.use(require('multer')({ dest: path.join(__dirname, 'temp') }).any());
 app.use(require('serve-favicon')(path.join(__dirname, 'assets', 'favicon.ico')));
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
-
-require(path.join(_rootPath, 'libs', 'cleanup.js')).Cleanup();
+app.use(require(path.join(_rootPath, 'libs', 'auth')).auth);
+// require(path.join(_rootPath, 'libs', 'cleanup.js')).Cleanup();
 switch (process.env.NODE_ENV) {
     case 'development':
         require(path.join(_rootPath, 'libs', 'router.js'))(app);

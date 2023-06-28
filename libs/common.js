@@ -692,21 +692,12 @@ module.exports = {
             let urlBinding = "https://" + req.hostname + '/system/web/apps/login/'
             _.extend(o, {
                 user: _.has(req.session, 'user') ? req.session.user : null,
-                projectName: _config.app.name,
-                urlBinding: urlBinding,
-                company: _.has(req.session, 'auth') && _.has(req.session.auth, 'company') && !_.isNull(req.session.auth.company) ? req.session.auth.company : {
-                    _id: null,
-                    name: 'CRM'
-                },
-                breadCrumbs: _.breadCrumbs(_.has(req.session, 'menuRouter') ? req.session.menuRouter : [], req.originalUrl),
-                auth: _.has(req.session, 'auth') && _.has(req.session.auth, 'role') ? req.session.auth.role.name : null,
                 page: _.has(o, 'page') ? o.page : v,
                 plugins: _.has(o, 'plugins') ? o.plugins : [],
-                menu: _.has(req.session, 'menuRouter') ? req.session.menuRouter : [],
                 crud: createCRUD(req.originalUrl, req.session.menuAccess)
             })
 
-            res.render((_.has(req.session, 'logged') && _.isEqual(req.session.logged, true) && !(_.has(o, 'custom-view') && o['custom-view'])) ? 'index' : o.page, o)
+            res.render((_.has(req.session, 'logged') && _.isEqual(req.session.logged, true) && !(_.has(o, 'custom-view') && o['custom-view'])) ? 'todo' : o.page, o)
         }
     },
     genTree: function (next) {
