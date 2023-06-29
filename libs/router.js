@@ -19,7 +19,6 @@ module.exports = function routers(app) {
         app.resource(_.trim(_.dasherize(_.replaceAll(file.toLowerCase(), '.js', ''))).toString(), require(path.join(_rootPath, 'controllers', file.toString())))
     })
     app.post('/login', function (req, res) {
-        console.log("login",req.body);
         var _body = _.pick(req.body, 'name', 'email', 'password', 'deviceId');
         if (!((_.has(_body, 'name') || _.has(_body, 'email')) && _.has(_body, 'password'))) return res.status(200).send({
             code: 406,
@@ -33,7 +32,7 @@ module.exports = function routers(app) {
                 return res.status(200).send({ code: 406, message: 'Tài khoản đã bị khoá' });
             }
             req.session['logged'] = true;
-            console.log("success login ma", user)
+            console.log("success login ma")
             var dataResponse = {
                 code: 200,
                 agentId: user.idAgentCisco,
@@ -46,5 +45,25 @@ module.exports = function routers(app) {
             console.log("req.xhr",req.xhr);
             req.xhr ? res.status(200).send(dataResponse) : res.redirect('/');
         });
+    });
+
+    app.get('/logout', function (req, res) {
+        var agentId = req.session.user ? req.session.user._id : null;
+        console.log("req",req);
+        console.log("_socketUsers",_socketUsers);
+        if (req.session.user && _socketUsers[agentId] && _.isEqual(_socketUsers[agentId].sessionID, req.sessionID)) {
+            var monitor = _socketUsers[agentId] ? _socketUsers[agentId].monitor : null;
+            if (monitor) monitor.destroy();
+            delete _socketUsers[agentId];
+
+            _.each(sio.sockets.sockets, function (s, k) {
+                s.emit("agentOffline", agentId);
+            });
+        }
+
+        req.session.user = null;
+        req.session.auth = null;
+        req.session.logged = false;
+        res.redirect('/');
     });
 }

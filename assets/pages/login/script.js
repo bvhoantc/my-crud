@@ -1,12 +1,16 @@
 var DFT = function ($) {
     var bindClick = function(){
         $(document).on('click', '#btn-login', function () {
-            console.log("aloo");
             requestManagement();
+        });
+        // Nhấn enter khi login
+        $(document).on('keyup', '#password', function (e) {
+            if(e.keyCode == 13){
+                requestManagement()
+            }
         });
     }
     function requestManagement(){
-        console.log("2");
         var filter = _.chain($('.searchColumn')).reduce(function (memo, el) {
             if (!_.isEqual($(el).val(), '')) memo[el.name] = $(el).val();
             return memo;
@@ -18,7 +22,7 @@ var DFT = function ($) {
                 window.location.href = 'todo';
             } else {
                 Swal.fire({
-                    title: 'Cảnh báo !',
+                    title: 'Thông báo !',
                     text: resp.message || '',
                     type: 'warning',
                     confirmButtonColor: "#DD6B55",
@@ -30,13 +34,11 @@ var DFT = function ($) {
 
     return {
         init: function () {
-            if (!$('.login-content')[0]) {
-                // scrollbar('html', 'rgba(0,0,0,0.3)', '5px');
-            }
             bindClick();
         },
         uncut: function () {
-            //$('#frm-login').validationEngine('detach');
+            $(document).off('keyup', '#btn-login');
+            $(document).off('click', '#btn-login');
         }
     };
 }(jQuery);
